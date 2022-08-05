@@ -438,3 +438,4 @@ Concurrency: 6, throughput: 35.2 infer/sec, latency 168920 usec
 Concurrency: 7, throughput: 37.2 infer/sec, latency 187942 usec
 Concurrency: 8, throughput: 37.6 infer/sec, latency 214759 usec
 ```
+

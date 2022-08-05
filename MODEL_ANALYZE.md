@@ -39,3 +39,10 @@ model-analyzer profile -m /models --profile-models resnet50_trt
 ```
 
 
+Amorteringsunderlag fran banken. Bestall av Norde
+Frida 3 seanste lon spec
+lgh forteckning
+- 1 -3 dagar process
+- skicka forbeviljning
+- Hum om rantan: rorligt 2.15 - 2
+
