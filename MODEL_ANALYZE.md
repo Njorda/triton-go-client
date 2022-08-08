@@ -44,5 +44,6 @@ Frida 3 seanste lon spec
 lgh forteckning
 - 1 -3 dagar process
 - skicka forbeviljning
-- Hum om rantan: rorligt 2.15 - 2
+- Hum om rantan: rorligt 2.15 - 2.17
+- 
 
