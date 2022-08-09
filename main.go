@@ -145,17 +145,3 @@ func readInt32(fourBytes []byte) int32 {
 	binary.Read(buf, binary.LittleEndian, &retval)
 	return retval
 }
-
-// Convert output's raw bytes into int32 data (assumes Little Endian)
-func Postprocess(inferResponse *triton.ModelInferResponse) [][]int32 {
-	outputBytes0 := inferResponse.RawOutputContents[0]
-	outputBytes1 := inferResponse.RawOutputContents[1]
-
-	outputData0 := make([]int32, outputSize)
-	outputData1 := make([]int32, outputSize)
-	for i := 0; i < outputSize; i++ {
-		outputData0[i] = readInt32(outputBytes0[i*4 : i*4+4])
-		outputData1[i] = readInt32(outputBytes1[i*4 : i*4+4])
-	}
-	return [][]int32{outputData0, outputData1}
-}
