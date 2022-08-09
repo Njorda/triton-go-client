@@ -6,4 +6,12 @@ In this case we will utilize the model developed in the previous blog post [Trit
 
 Since the go grpc client is not exported and instead have to be generated, I have copied it inside here to make it easier. When trying to generate the client the code seems to be out of date and not working any longer but made a [PR](https://github.com/triton-inference-server/client/pull/138) that is not yet reviewed with suggested changes. For now I will assume we have it generated locally. 
 
+Get the example image: 
 
+```bash
+    wget https://raw.githubusercontent.com/triton-inference-server/server/main/qa/images/mug.jpg -O "mug.jpg"
+```
+
+```
+go run main.go
+```
