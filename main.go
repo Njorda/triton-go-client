@@ -16,9 +16,7 @@ import (
 
 const (
 	url        = "localhost:8001"
-	model_name = "ensemble_image2vec"
-	inputSize  = 16
-	outputSize = 16
+	model_name = "ensemble_python_resnet50"
 )
 
 func main() {
@@ -46,7 +44,7 @@ func main() {
 	fmt.Println(modelMetadataResponse)
 
 	// Read the image here
-	data, err := ioutil.ReadFile("myfile.jpg")
+	data, err := ioutil.ReadFile("mug.jpg")
 	if err != nil {
 		panic(err)
 	}
@@ -111,7 +109,7 @@ func ModelInferRequest(client triton.GRPCInferenceServiceClient, rawInput []byte
 		&triton.ModelInferRequest_InferInputTensor{
 			Name:     "INPUT",
 			Datatype: "TYPE_UINT8",
-			Shape:    []int64{1005970},
+			Shape:    []int64{1, 1005970},
 		},
 	}
 
