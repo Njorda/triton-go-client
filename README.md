@@ -17,3 +17,20 @@ Th
 ```
 go run main.go
 ```
+
+
+This error seems to happen when you dont have enough memory for the automatic down cast to work:
+```
+[08/17/2022-06:53:37] [W] [TRT] parsers/onnx/onnx2trt_utils.cpp:368: Your ONNX model has been generated with INT64 weights, while TensorRT does not natively support INT64. Attempting to cast down to INT32.
+```
+
+Make sure your graphics card is not low on memory and ofc big enough for your model. 
+
+
+```bash
+pip install cv2 bson
+```
+
+```bash
+apt-get install python3-opencv
+```
