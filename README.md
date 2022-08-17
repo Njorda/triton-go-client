@@ -28,9 +28,14 @@ Make sure your graphics card is not low on memory and ofc big enough for your mo
 
 
 ```bash
-pip install cv2 bson
+pip install opencv-python bson
 ```
 
 ```bash
 apt-get install python3-opencv
+```
+
+to run the client
+```
+docker run --net=host -it -v $(pwd):/home gocv/opencv /bin/bash
 ```

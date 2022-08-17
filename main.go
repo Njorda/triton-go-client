@@ -131,7 +131,7 @@ func ModelInferRequest(client triton.GRPCInferenceServiceClient, rawInput []byte
 	inferInputs := []*triton.ModelInferRequest_InferInputTensor{
 		&triton.ModelInferRequest_InferInputTensor{
 			Name:     "INPUT",
-			Datatype: "BYTES",
+			Datatype: "TYPE_UINT8",
 			Shape:    []int64{-1},
 		},
 	}
