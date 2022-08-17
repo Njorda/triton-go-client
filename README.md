@@ -12,6 +12,8 @@ Get the example image:
     wget https://raw.githubusercontent.com/triton-inference-server/server/main/qa/images/mug.jpg -O "mug.jpg"
 ```
 
+
+Th
 ```
 go run main.go
 ```

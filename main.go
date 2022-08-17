@@ -74,7 +74,6 @@ func GenPayload(filePath string) ([]byte, error) {
 
 	d := Data{Data: result, Name: filePath}
 	return bson.Marshal(d)
-
 }
 
 func ServerLiveRequest(client triton.GRPCInferenceServiceClient) *triton.ServerLiveResponse {
