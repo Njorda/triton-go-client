@@ -3,14 +3,16 @@ module github.com/Njorda/trition-go-client
 go 1.18
 
 require (
+	go.mongodb.org/mongo-driver v1.10.1
+	gocv.io/x/gocv v0.31.0
 	google.golang.org/grpc v1.48.0
 	google.golang.org/protobuf v1.28.0
 )
 
 require (
 	github.com/golang/protobuf v1.5.2 // indirect
-	golang.org/x/net v0.0.0-20201021035429-f5854403a974 // indirect
-	golang.org/x/sys v0.0.0-20210119212857-b64e53b001e4 // indirect
-	golang.org/x/text v0.3.3 // indirect
+	golang.org/x/net v0.0.0-20211112202133-69e39bad7dc2 // indirect
+	golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1 // indirect
+	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013 // indirect
 )
