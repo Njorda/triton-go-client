@@ -24,11 +24,10 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import sys
 import json
 import io
-import bson
-import cv2
-
+import os
 
 # triton_python_backend_utils is available in every Triton Python model. You
 # need to use this module to create inference requests and responses. It also
@@ -121,13 +120,9 @@ class TritonPythonModel:
                 image = image.unsqueeze(0)
                 return image
 
-            payload = bson.loads(in_0)
-            b = np.frombuffer(payload["data"], np.uint8)
-            img = cv2.imdecode(b)
+            img = in_0.as_numpy()
 
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            image = Image.fromarray(img)
-
+            image = Image.open(io.BytesIO(img.tobytes()))
             img_out = image_loader(image)
             img_out = np.array(img_out)
 

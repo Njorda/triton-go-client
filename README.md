@@ -39,3 +39,8 @@ to run the client
 ```
 docker run --net=host -it -v $(pwd):/home gocv/opencv /bin/bash
 ```
+
+
+https://github.com/triton-inference-server/server/blob/da3cc5b12055e737cfee53452a6edabfb25de49f/docs/model_configuration.md#datatypes
+
+STRING

@@ -12,7 +12,6 @@ import (
 	"gocv.io/x/gocv"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"gopkg.in/mgo.v2/bson"
 )
 
 const (
@@ -49,31 +48,29 @@ func main() {
 	modelMetadataResponse := ModelMetadataRequest(client, model_name, "1")
 	fmt.Println(modelMetadataResponse)
 
-	data, err := GenPayload("mug.jpg")
-	if err != nil {
-		panic(err)
-	}
+	data := GenPayload("mug.jpg")
 
 	_ = ModelInferRequest(client, data, model_name, "1")
 	fmt.Println("THIS IS A SUCCESS")
 }
 
 // Generates the bson payload for an image
-func GenPayload(filePath string) ([]byte, error) {
-	mat := gocv.IMRead(filePath, gocv.IMReadGrayScale)
+func GenPayload(filePath string) []byte {
+	mat := gocv.IMRead("mug.jpg", gocv.IMReadGrayScale)
 	defer mat.Close()
-
-	buf, err := gocv.IMEncode(gocv.JPEGFileExt, mat)
-	if err != nil {
-		panic(err)
+	out := []uint8{}
+	for j := 0; j < mat.Rows(); j++ {
+		for i := 0; i < mat.Cols(); i++ {
+			out = append(out, mat.GetUCharAt(j, i))
+		}
 	}
 
-	defer buf.Close()
-	result := make([]byte, buf.Len())
-	copy(result, buf.GetBytes())
-
-	d := Data{Data: result, Name: filePath}
-	return bson.Marshal(d)
+	var inputBytes []byte
+	for i := 0; i < len(out); i++ {
+		inputBytes = append(inputBytes, out[i])
+		return inputBytes
+	}
+	return inputBytes
 }
 
 func ServerLiveRequest(client triton.GRPCInferenceServiceClient) *triton.ServerLiveResponse {
@@ -131,7 +128,7 @@ func ModelInferRequest(client triton.GRPCInferenceServiceClient, rawInput []byte
 	inferInputs := []*triton.ModelInferRequest_InferInputTensor{
 		&triton.ModelInferRequest_InferInputTensor{
 			Name:     "INPUT",
-			Datatype: "TYPE_UINT8",
+			Datatype: "UINT8",
 			Shape:    []int64{-1},
 		},
 	}
@@ -150,7 +147,6 @@ func ModelInferRequest(client triton.GRPCInferenceServiceClient, rawInput []byte
 		Inputs:       inferInputs,
 		Outputs:      inferOutputs,
 	}
-
 	modelInferRequest.RawInputContents = append(modelInferRequest.RawInputContents, rawInput)
 
 	// Submit inference request to server
