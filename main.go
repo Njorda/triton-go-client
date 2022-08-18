@@ -127,9 +127,10 @@ func ModelInferRequest(client triton.GRPCInferenceServiceClient, rawInput []byte
 	// Create request input tensors
 	inferInputs := []*triton.ModelInferRequest_InferInputTensor{
 		&triton.ModelInferRequest_InferInputTensor{
-			Name:     "INPUT",
-			Datatype: "UINT8",
-			Shape:    []int64{-1},
+			Name:       "INPUT",
+			Datatype:   "UINT8",
+			Shape:      []int64{1, int64(len(rawInput))},
+			Parameters: map[string]*triton.InferParameter{"binary_data_size": {ParameterChoice: &triton.InferParameter_Int64Param{Int64Param: int64(len(rawInput))}}},
 		},
 	}
 
