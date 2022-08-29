@@ -28,10 +28,11 @@ Make sure your graphics card is not low on memory and ofc big enough for your mo
 
 
 ```bash
-pip install opencv-python bson
+    pip install numpy pillow torchvision opencv-python bson
 ```
 
 ```bash
+apt-get update
 apt-get install python3-opencv
 ```
 
@@ -44,3 +45,11 @@ docker run --net=host -it -v $(pwd):/home gocv/opencv /bin/bash
 https://github.com/triton-inference-server/server/blob/da3cc5b12055e737cfee53452a6edabfb25de49f/docs/model_configuration.md#datatypes
 
 STRING
+
+https://github.com/triton-inference-server/python_backend/blob/main/src/resources/triton_python_backend_utils.py
+
+
+https://github.com/triton-inference-server/python_backend/blob/5b2c1a159b33f8dc17fb884df07aef82b622a3a0/examples/preprocessing/client.py#L92
+
+https://github.com/triton-inference-server/client/blob/6cc412c50ca4282cec6e9f62b3c2781be433dcc6/src/python/library/tritonclient/grpc/__init__.py#L1795
+
