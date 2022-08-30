@@ -105,6 +105,7 @@ class TritonPythonModel:
             # Get INPUT0
             in_0 = pb_utils.get_input_tensor_by_name(request, "INPUT_0")
 
+
             normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                              std=[0.229, 0.224, 0.225])
 
@@ -121,7 +122,9 @@ class TritonPythonModel:
                 return image
 
             img = in_0.as_numpy()
-
+            print(img.shape)
+            print(img.shape)
+            print(img.shape)
             image = Image.open(io.BytesIO(img.tobytes()))
             img_out = image_loader(image)
             img_out = np.array(img_out)
