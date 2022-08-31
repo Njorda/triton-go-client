@@ -121,10 +121,9 @@ class TritonPythonModel:
                 image = image.unsqueeze(0)
                 return image
 
-            img = in_0.as_numpy()
-            print(img.shape)
-            print(img.shape)
-            print(img.shape)
+            b = bson.loads(f.read())
+
+            nparr = np.asarray(bytearray(b["data"]), dtype=np.uint8).reshape((2521, 3361, 3))
             image = Image.open(io.BytesIO(img.tobytes()))
             img_out = image_loader(image)
             img_out = np.array(img_out)

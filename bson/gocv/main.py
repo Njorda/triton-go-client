@@ -10,7 +10,8 @@ def main():
         b = bson.loads(f.read())
         print(b.keys())
         nparr = np.asarray(bytearray(b["data"]), dtype=np.uint8).reshape((2521, 3361, 3))
-        cv2.imwrite("./mugFromPython.jpg", nparr)
+        cv2.imwrite("./mugFromPython2.jpg", nparr)
+        print("TOW TOW")
 
 if __name__ == '__main__':
     main()
