@@ -30,7 +30,7 @@ max_batch_size: 256
 input [
 {
     name: "INPUT_0"
-    data_type: TYPE_UINT8
+    data_type: TYPE_STRING
     dims: [ -1 ]
 }
 ]
