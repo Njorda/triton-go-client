@@ -24,10 +24,8 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import sys
 import json
 import io
-import os
 
 # triton_python_backend_utils is available in every Triton Python model. You
 # need to use this module to create inference requests and responses. It also
@@ -38,7 +36,6 @@ import torchvision.transforms as transforms
 import numpy as np
 
 from PIL import Image
-from typing import List
 
 class TritonPythonModel:
     """Your Python model must use the same class name. Every Python model

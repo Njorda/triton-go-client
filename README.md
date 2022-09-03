@@ -53,3 +53,39 @@ https://github.com/triton-inference-server/python_backend/blob/5b2c1a159b33f8dc1
 
 https://github.com/triton-inference-server/client/blob/6cc412c50ca4282cec6e9f62b3c2781be433dcc6/src/python/library/tritonclient/grpc/__init__.py#L1795
 
+
+## Setup 
+
+
+1) Build the model 
+```
+    docker run -it --runtime=nvidia -v $(pwd):/workspace nvcr.io/nvidia/pytorch:22.06-py3 bash
+    pip install numpy pillow torchvision
+    python onnx_exporter.py --save model.onnx
+```
+
+2) Convert the ML model to ONNX and then to TensorRT
+
+```
+    docker run -it --runtime=nvidia -v $(pwd):/workspace nvcr.io/nvidia/pytorch:22.06-py3 bash
+    pip install numpy pillow torchvision
+    python onnx_exporter.py --save model.onnx
+    trtexec --onnx=model.onnx --saveEngine=./model_repository/resnet50_trt/1/model.plan --explicitBatch --minShapes=input:1x3x224x224 --optShapes=input:1x3x224x224 --maxShapes=input:256x3x224x224 --fp16
+
+
+```
+
+3) Create the different model folders and add pre- and postprocessing
+
+```
+    mkdir -p model_repository/ensemble_python_resnet50/1
+    mkdir -p model_repository/preprocessing/1
+    mkdir -p model_repository/postprocessing/1
+    mkdir -p model_repository/resnet50_trt/1
+    
+    # Copy the Python model
+    cp preprocessing.py model_repository/preprocessing/1/model.py
+    cp postprocessing.py model_repository/postprocessing/1/model.py
+```
+
+4)
