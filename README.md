@@ -88,4 +88,8 @@ https://github.com/triton-inference-server/client/blob/6cc412c50ca4282cec6e9f62b
     cp postprocessing.py model_repository/postprocessing/1/model.py
 ```
 
-4)
+4) Start the model sever
+    docker run --runtime=nvidia -it --shm-size=1gb --rm -p8000:8000 -p8001:8001 -p8002:8002 -v$(pwd):/workspace/ -v/$(pwd)/model_repository:/models nvcr.io/nvidia/tritonserver:22.06-py3 bash
+    pip install numpy pillow torchvision bson
+    python3  -m pip install opencv-python
+    tritonserver --model-repository=/models
