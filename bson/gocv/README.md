@@ -20,6 +20,13 @@ From the root folder, to run the python code:
 docker run -it -v $(pwd):/home opencvcourses/opencv-docker /bin/bash
 ```
 
+install deps
 ```
 pip install bson
+```
+
+open the bson in python
+```
+cd /bson/gocv
+python main.py
 ```

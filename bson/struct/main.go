@@ -18,12 +18,7 @@ type Frame struct {
 func main() {
 	writeMat := gocv.IMRead("./mug.jpg", gocv.IMReadColor)
 	defer writeMat.Close()
-
-	writeImg := Frame{}
-	writeImg.Image = writeMat.ToBytes()
-	writeImg.Id = fmt.Sprintf("%v_test.jpg", time.Now().Unix())
-
-	b, err := bson.Marshal(writeImg)
+	b, err := marshalImage(fmt.Sprintf("%v_test.jpg", time.Now().Unix()), writeMat)
 	if err != nil {
 		panic(err)
 	}
@@ -32,4 +27,16 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func marshalImage(id string, mat gocv.Mat) ([]byte, error) {
+	writeImg := Frame{}
+	writeImg.Image = mat.ToBytes()
+	writeImg.Id = id
+
+	b, err := bson.Marshal(writeImg)
+	if err != nil {
+		return nil, err
+	}
+	return b, nil
 }

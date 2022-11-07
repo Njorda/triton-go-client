@@ -71,7 +71,7 @@ https://github.com/triton-inference-server/client/blob/6cc412c50ca4282cec6e9f62b
     pip install numpy pillow torchvision
     python onnx_exporter.py --save model.onnx
     trtexec --onnx=model.onnx --saveEngine=./model_repository/resnet50_trt/1/model.plan --explicitBatch --minShapes=input:1x3x224x224 --optShapes=input:1x3x224x224 --maxShapes=input:256x3x224x224 --fp16
-
+    --workspace=7192
 
 ```
 
