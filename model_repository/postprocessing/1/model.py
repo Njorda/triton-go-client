@@ -1,31 +1,7 @@
-# Copyright (c) 2021, NVIDIA CORPORATION. All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
-#  * Redistributions of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-#  * Redistributions in binary form must reproduce the above copyright
-#    notice, this list of conditions and the following disclaimer in the
-#    documentation and/or other materials provided with the distribution.
-#  * Neither the name of NVIDIA CORPORATION nor the names of its
-#    contributors may be used to endorse or promote products derived
-#    from this software without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ``AS IS'' AND ANY
-# EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-# PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-# PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
-# OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import numpy as np
+import sys
 import json
-import bson
 import io
 
 # triton_python_backend_utils is available in every Triton Python model. You
@@ -33,10 +9,11 @@ import io
 # contains some utility functions for extracting information from model_config
 # and converting Triton input/output types to numpy types.
 import triton_python_backend_utils as pb_utils
-import torchvision.transforms as transforms
-import numpy as np
 
 from PIL import Image
+import torchvision.transforms as transforms
+import os
+
 
 class TritonPythonModel:
     """Your Python model must use the same class name. Every Python model
@@ -92,56 +69,18 @@ class TritonPythonModel:
           A list of pb_utils.InferenceResponse. The length of this list must
           be the same as `requests`
         """
-
-        output0_dtype = self.output0_dtype
-
         responses = []
 
         # Every Python backend must iterate over everyone of the requests
         # and create a pb_utils.InferenceResponse for each of them.
         for request in requests:
-            # Get INPUT0
             in_0 = pb_utils.get_input_tensor_by_name(request, "INPUT_0")
-
-
-            normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                             std=[0.229, 0.224, 0.225])
-
-            loader = transforms.Compose([
-                transforms.Resize([224, 224]),
-                transforms.CenterCrop(224),
-                transforms.ToTensor(), normalize
-            ])
-
-            def image_loader(image_name):
-                image = loader(image_name)
-                #expand the dimension to nchw
-                image = image.unsqueeze(0)
-                return image
-
-            b = bson.loads(in_0.as_numpy().tostring())
-
-            img = np.asarray(bytearray(b["data"]), dtype=np.uint8).reshape((2521, 3361, 3))
-            image = Image.open(io.BytesIO(img.tobytes()))
-            img_out = image_loader(image)
-            img_out = np.array(img_out)
-
-            out_tensor_0 = pb_utils.Tensor("OUTPUT_0",
-                                           img_out.astype(output0_dtype))
-
-            # Create InferenceResponse. You can set an error here in case
-            # there was a problem with handling this inference request.
-            # Below is an example of how you can set errors in inference
-            # response:
-            #
-            # pb_utils.InferenceResponse(
-            #    output_tensors=..., TritonError("An error occured"))
+            img = in_0.as_numpy()
+            out_tensor_0 = pb_utils.Tensor("OUTPUT_0", img.astype(self.output0_dtype))
             inference_response = pb_utils.InferenceResponse(
                 output_tensors=[out_tensor_0])
             responses.append(inference_response)
 
-        # You should return a list of pb_utils.InferenceResponse. Length
-        # of this list must match the length of `requests` list.
         return responses
 
     def finalize(self):
