@@ -1,12 +1,14 @@
 package main
 
 import (
-	"bytes"
+        "bytes"
 	"context"
 	"encoding/binary"
 	"fmt"
 	"log"
 	"time"
+        "os"
+        "errors"
 
 	triton "github.com/Njorda/trition-go-client/grpc-client"
 	"gocv.io/x/gocv"
@@ -49,7 +51,7 @@ func main() {
 	modelMetadataResponse := ModelMetadataRequest(client, model_name, "1")
 	fmt.Println(modelMetadataResponse)
 
-	data, err := GenPayload("mug.jpg")
+	data, err := GenPayload("./bson/gocv/mug.jpg")
 	if err != nil {
 		panic(err)
 	}
@@ -59,12 +61,17 @@ func main() {
 }
 
 // Generates the bson payload for an image
-func GenPayload(filePath string) ([]byte, err) {
-	mat := gocv.IMRead("mug.jpg", gocv.IMReadGrayScale)
+func GenPayload(filePath string) ([]byte, error) {
+	mat := gocv.IMRead(filePath, gocv.IMReadGrayScale)
+        if _, err := os.Stat(filePath); errors.Is(err, os.ErrNotExist) {
+            panic(err)
+        }
 	defer mat.Close()
-	data := Data{}
+	data := Data{Name: "hello"}
 	data.Data = mat.ToBytes()
+        fmt.Println(len(data.Data))
 	b, err := bson.Marshal(data)
+        fmt.Println(len(b))
 	return b, err
 }
 
@@ -124,9 +131,10 @@ func ModelInferRequest(client triton.GRPCInferenceServiceClient, rawInput []byte
 		&triton.ModelInferRequest_InferInputTensor{
 			Name:       "INPUT",
 			Datatype:   "BYTES",
-			Shape:      []int64{1, int64(len(rawInput))},
+			Shape:      []int64{1, 1},
 			Parameters: map[string]*triton.InferParameter{"binary_data_size": {ParameterChoice: &triton.InferParameter_Int64Param{Int64Param: int64(len(rawInput))}}},
-		},
+	                Contents: &triton.InferTensorContents{BytesContents: [][]byte{rawInput}},	
+               },
 	}
 
 	// Create request input output tensors
@@ -143,7 +151,12 @@ func ModelInferRequest(client triton.GRPCInferenceServiceClient, rawInput []byte
 		Inputs:       inferInputs,
 		Outputs:      inferOutputs,
 	}
-	modelInferRequest.RawInputContents = append(modelInferRequest.RawInputContents, rawInput)
+	//modelInferRequest.Inputs = append(modelInferRequest.Inputs, inferInputs)
+        
+
+       fmt.Println(int64(len(rawInput)))
+       fmt.Println(int64(len(rawInput)))
+       fmt.Println(int64(len(rawInput)))
 
 	// Submit inference request to server
 	modelInferResponse, err := client.ModelInfer(ctx, &modelInferRequest)
