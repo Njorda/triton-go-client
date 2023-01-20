@@ -70,6 +70,7 @@ https://github.com/triton-inference-server/client/blob/6cc412c50ca4282cec6e9f62b
     docker run -it --gpus all --ipc=host -v $(pwd):/workspace nvcr.io/nvidia/pytorch:22.06-py3 bash 
     pip install numpy pillow torchvision
     python onnx_exporter.py --save model.onnx
+    mkdir model_repository/resnet50_trt/1
     trtexec --onnx=model.onnx --saveEngine=./model_repository/resnet50_trt/1/model.plan --explicitBatch --minShapes=input:1x3x224x224 --optShapes=input:1x3x224x224 --maxShapes=input:256x3x224x224 --fp16 --workspace=13384 --verbose
 
 ```
@@ -101,4 +102,10 @@ this is probably due to that the output path is wrong.
     pip install numpy pillow torchvision bson
     python3  -m pip install opencv-python
     tritonserver --model-repository=/models
+```
+
+5) Run the go client
+
+```go 
+docker run -it --network host -v $(pwd):/go/src gocv/opencv /bin/bash
 ```
