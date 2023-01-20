@@ -1,0 +1,79 @@
+SELECT
+id
+, time
+, image_normal_path
+, image_path
+, first_line_pos
+, last_line_pos
+, roll_sections_id
+, COALESCE(roll_sections, '[{}]')::json
+, COALESCE(defects, '[{}]')::json
+, COALESCE(codes, '[{}]')::json
+FROM (
+     SELECT images.id AS id
+     ,images.time AT TIME ZONE 'UTC' as time
+     ,images.image_normal_path
+     ,images.image_path
+     ,images.first_line_pos
+     ,images.last_line_pos
+     ,measurements.id as roll_sections_id
+     ,measurements.roll_sections
+     ,defects.defect as defects
+     ,dmc.codes as codes
+ FROM (
+         SELECT id
+             ,meta_observed AS TIME
+             ,payload::json->>'imageNormalPath'::varchar(50) AS "image_normal_path"
+             ,payload::json->>'imagePath'::varchar(50) AS "image_path"
+             ,payload::json->>'firstLinePos' AS "first_line_pos"
+             ,payload::json->>'lastLinePos' AS "last_line_pos"
+             ,meta_observed
+         FROM events
+         WHERE meta_type = 'VisionImageCaptured'
+         AND meta_observed >= '2022-08-11 06:16:10'
+         AND meta_observed < '2022-08-11 06:21:10'
+         AND actor = 'F1.A1.CD.CLD01.BX1.KEA1.BXC1') images LEFT JOIN  (
+         SELECT
+             id
+             ,roll_sections
+             ,meta_observed
+             FROM (SELECT
+                 id
+                 ,e.payload->'rollSections' AS roll_sections
+                 ,meta_observed
+                 FROM events e
+                 WHERE meta_type = 'RollSectionsDetected'
+                 AND meta_observed >= '2022-08-11 06:16:10'
+                 AND meta_observed < '2022-08-11 06:21:10'
+                 AND actor = 'F1.A1.CD.CLD01.BX1.KEA1.BXC1'
+             ) AS tmp
+         ) measurements
+ ON images.meta_observed = measurements.meta_observed
+ LEFT JOIN
+         (SELECT
+         id
+         , meta_observed
+         , payload->'pixelsPerMillimeter' as pixels_per_mm
+         , payload->'defectRegions' as defect
+         FROM events
+         WHERE meta_type = 'RollDefectDetected'
+         AND meta_observed >= '2022-08-11 06:16:10'
+         AND meta_observed < '2022-08-11 06:21:10'
+         AND actor = 'F1.A1.CD.CLD01.BX1.KEA1.BXC1'
+         ) defects
+ ON images.meta_observed = defects.meta_observed
+ LEFT JOIN (
+         SELECT
+         id
+         , meta_observed
+         , payload->'codes' AS codes
+         FROM events
+         WHERE meta_type = 'DataMatrixCodeDetected'
+         AND meta_observed >= '2022-08-11 06:16:10'
+         AND meta_observed < '2022-08-11 06:21:10'
+         AND actor = 'F1.A1.CD.CLD01.BX1.KEA1.BXC1'
+     ) dmc
+ ON images.meta_observed = dmc.meta_observed
+ )combined
+ORDER BY time ASC
+;

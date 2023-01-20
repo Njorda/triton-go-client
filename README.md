@@ -67,13 +67,20 @@ https://github.com/triton-inference-server/client/blob/6cc412c50ca4282cec6e9f62b
 2) Convert the ML model to ONNX and then to TensorRT
 
 ```
-    docker run -it --runtime=nvidia -v $(pwd):/workspace nvcr.io/nvidia/pytorch:22.06-py3 bash
+    docker run -it --gpus all --ipc=host -v $(pwd):/workspace nvcr.io/nvidia/pytorch:22.06-py3 bash 
     pip install numpy pillow torchvision
     python onnx_exporter.py --save model.onnx
-    trtexec --onnx=model.onnx --saveEngine=./model_repository/resnet50_trt/1/model.plan --explicitBatch --minShapes=input:1x3x224x224 --optShapes=input:1x3x224x224 --maxShapes=input:256x3x224x224 --fp16
-    --workspace=7192
+    trtexec --onnx=model.onnx --saveEngine=./model_repository/resnet50_trt/1/model.plan --explicitBatch --minShapes=input:1x3x224x224 --optShapes=input:1x3x224x224 --maxShapes=input:256x3x224x224 --fp16 --workspace=13384 --verbose
 
 ```
+If you get: 
+
+```
+[11/19/2022-09:46:27] [E] Saving engine to file failed.
+[11/19/2022-09:46:27] [E] Engine set up failed
+```
+
+this is probably due to that the output path is wrong. 
 
 3) Create the different model folders and add pre- and postprocessing
 
@@ -89,7 +96,9 @@ https://github.com/triton-inference-server/client/blob/6cc412c50ca4282cec6e9f62b
 ```
 
 4) Start the model sever
+```
     docker run --runtime=nvidia -it --shm-size=1gb --rm -p8000:8000 -p8001:8001 -p8002:8002 -v$(pwd):/workspace/ -v/$(pwd)/model_repository:/models nvcr.io/nvidia/tritonserver:22.06-py3 bash
     pip install numpy pillow torchvision bson
     python3  -m pip install opencv-python
     tritonserver --model-repository=/models
+```

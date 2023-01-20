@@ -59,11 +59,21 @@ func main() {
 }
 
 // Generates the bson payload for an image
-func GenPayload(filePath string) ([]byte, err) {
+func GenPayload(filePath string) ([]byte, error) {
+	filename := 
 	mat := gocv.IMRead("mug.jpg", gocv.IMReadGrayScale)
+
+	if _, err := os.Stat("/path/to/whatever"); errors.Is(err, os.ErrNotExist) {
+		// path/to/whatever does not exist
+	  }
+	fmt.Println()
 	defer mat.Close()
-	data := Data{}
-	data.Data = mat.ToBytes()
+	data := Data{
+		Name: "Hello here we go",
+	}
+	bytes := []byte{}
+	copy(mat.ToBytes(), bytes)
+	data.Data = bytes
 	b, err := bson.Marshal(data)
 	return b, err
 }
@@ -126,6 +136,7 @@ func ModelInferRequest(client triton.GRPCInferenceServiceClient, rawInput []byte
 			Datatype:   "BYTES",
 			Shape:      []int64{1, int64(len(rawInput))},
 			Parameters: map[string]*triton.InferParameter{"binary_data_size": {ParameterChoice: &triton.InferParameter_Int64Param{Int64Param: int64(len(rawInput))}}},
+			Contents: &triton.InferTensorContents{BytesContents: [][]byte{rawInput}}
 		},
 	}
 
@@ -143,7 +154,7 @@ func ModelInferRequest(client triton.GRPCInferenceServiceClient, rawInput []byte
 		Inputs:       inferInputs,
 		Outputs:      inferOutputs,
 	}
-	modelInferRequest.RawInputContents = append(modelInferRequest.RawInputContents, rawInput)
+	//modelInferRequest.Inputs = append(modelInferRequest.Inputs, rawInput)
 
 	// Submit inference request to server
 	modelInferResponse, err := client.ModelInfer(ctx, &modelInferRequest)

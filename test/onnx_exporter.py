@@ -1,4 +1,3 @@
-
 # Copyright (c) 2021, NVIDIA CORPORATION. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -25,60 +24,37 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-name: "ensemble_python_resnet50"
-platform: "ensemble"
-max_batch_size: 256
-input [
-  {
-    name: "INPUT"
-    data_type: TYPE_STRING
-    dims: [ -1 ]
-  }
-]
-output [
-  {
-    name: "PREDICTION"
-    data_type: TYPE_FP32
-    dims: [ 1000 ]
-  }
-]
-ensemble_scheduling {
-  step [
-    {
-      model_name: "preprocessing"
-      model_version: -1 # This will give the latest version
-      input_map {
-        key: "INPUT_0"
-        value: "INPUT"
-      }
-      output_map {
-        key: "OUTPUT_0"
-        value: "preprocessed_image"
-      }
-    },
-    {
-      model_name: "resnet50_trt"
-      model_version: -1 # This will give the latest version
-      input_map {
-        key: "input"
-        value: "preprocessed_image"
-      }
-      output_map {
-        key: "output"
-        value: "OUTPUT"
-      }
-    },
-    {
-      model_name: "postprocessing"
-      model_version: -1 # This will give the latest version
-      input_map {
-        key: "INPUT_0"
-        value: "OUTPUT"
-      }
-      output_map {
-        key: "OUTPUT_0"
-        value: "PREDICTION"
-      }
-    }
-  ]
-}
+import torch
+import torchvision.models as models
+import argparse
+import os
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--save", default="model.onnx")
+    args = parser.parse_args()
+
+    resnet50 = models.resnet50(pretrained=True)
+    dummy_input = torch.randn(1, 3, 224, 224)
+    resnet50 = resnet50.eval()
+
+    torch.onnx.export(resnet50,
+                      dummy_input,
+                      args.save,
+                      export_params=True,
+                      opset_version=10,
+                      do_constant_folding=True,
+                      input_names=['input'],
+                      output_names=['output'],
+                      dynamic_axes={
+                          'input': {
+                              0: 'batch_size',
+                              2: "height",
+                              3: 'width'
+                          },
+                          'output': {
+                              0: 'batch_size'
+                          }
+                      })
+
+    print("Saved {}".format(args.save))

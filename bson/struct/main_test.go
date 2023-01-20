@@ -41,5 +41,4 @@ func BenchmarkBson(b *testing.B) {
 			panic(err)
 		}
 	}
-
 }
