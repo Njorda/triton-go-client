@@ -25,8 +25,9 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import json
-import bson
 import io
+import bson
+
 
 # triton_python_backend_utils is available in every Triton Python model. You
 # need to use this module to create inference requests and responses. It also
@@ -119,13 +120,26 @@ class TritonPythonModel:
                 image = image.unsqueeze(0)
                 return image
 
-            b = bson.loads(in_0.as_numpy().tostring())
+            print(in_0)
+            print(in_0.as_numpy().shape)
+       	    print(in_0.as_numpy().dtype)
+            #print(in_0.as_numpy()[0][0])
+       	    print("HERE HERE HERE HERE HERE HERE")
+            d = in_0.as_numpy().astype(np.bytes_)
+            #query = [t[0].decode("utf-16") for t in in_0.as_numpy().tolist()] 
+            #print(query)
+            print("HERE AGAIN")
+            b = bson.loads(in_0.as_numpy().tolist()[0][0])
+            print(b.keys())
+            print(b["Name"])
 
-            img = np.asarray(bytearray(b["data"]), dtype=np.uint8).reshape((2521, 3361, 3))
-            image = Image.open(io.BytesIO(img.tobytes()))
+            nparr = np.asarray(bytearray(b["data"]), dtype=np.uint8).reshape((2521, 3361, 1))
+            #image = Image.open(io.BytesIO(nparr.tobytes()))
+            nparr = np.squeeze(nparr, axis=2)
+            nparr = np.stack((nparr,)*3, axis=-1)
+            image = Image.fromarray(nparr,'RGB')
             img_out = image_loader(image)
             img_out = np.array(img_out)
-
             out_tensor_0 = pb_utils.Tensor("OUTPUT_0",
                                            img_out.astype(output0_dtype))
 
